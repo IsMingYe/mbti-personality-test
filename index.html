@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>四维人格偏好测验｜MBTI 框架增强版</title>
+  <meta name="description" content="用 48 道双极情境题探索四维人格偏好，查看连续倾向、边界维度、相邻可能类型与结果解读。" />
+  <meta name="theme-color" content="#0c1b33" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230c1b33'/%3E%3Cpath d='M16 18h12l4 9 4-9h12v28H38V32l-6 12-6-12v14H16z' fill='%23ffd54a'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --ink: #0c1b33;
+      --muted: #60708a;
+      --line: #dce4ee;
+      --paper: #f7f9fc;
+      --white: #ffffff;
+      --accent: #ffd54a;
+      --accent-ink: #2a2200;
+      --blue: #2f69d9;
+      --blue-soft: #eaf1ff;
+      --shadow: 0 22px 60px rgba(12, 27, 51, .11);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 8%, rgba(47, 105, 217, .10), transparent 24rem),
+        radial-gradient(circle at 92% 76%, rgba(255, 213, 74, .20), transparent 22rem),
+        var(--paper);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    button { font: inherit; }
+    .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 80px;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 820; letter-spacing: -.02em; }
+    .brand-mark {
+      width: 38px; height: 38px; display: grid; place-items: center;
+      border-radius: 12px; background: var(--ink); color: var(--accent); font-weight: 900;
+      box-shadow: 0 7px 18px rgba(12, 27, 51, .2);
+    }
+    .mini-note { color: var(--muted); font-size: .875rem; }
+    main { padding: 12px 0 64px; }
+    .intro { margin: 8px 0 24px; max-width: 760px; }
+    .eyebrow { margin: 0 0 8px; color: var(--blue); font-size: .83rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(2rem, 5vw, 4.1rem); line-height: 1.04; letter-spacing: -.055em; max-width: 850px; }
+    .intro p { margin: 16px 0 0; color: var(--muted); font-size: clamp(1rem, 2vw, 1.12rem); max-width: 680px; }
+    .layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 24px; align-items: start; }
+    .side, .card { border: 1px solid rgba(220, 228, 238, .9); background: rgba(255,255,255,.9); box-shadow: var(--shadow); }
+    .side { position: sticky; top: 18px; padding: 22px; border-radius: 24px; }
+    .side-label { display: flex; justify-content: space-between; color: var(--muted); font-size: .875rem; }
+    .side-label strong { color: var(--ink); }
+    .track { height: 9px; margin: 11px 0 24px; overflow: hidden; border-radius: 99px; background: #edf1f6; }
+    .fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), #77a0ef); transition: width .32s ease; }
+    .dimension-list { display: grid; gap: 12px; }
+    .dimension { display: grid; grid-template-columns: 30px 1fr 30px; align-items: center; gap: 9px; font-size: .82rem; font-weight: 800; }
+    .dimension span:first-child, .dimension span:last-child { display: grid; place-items: center; height: 30px; border-radius: 9px; background: var(--blue-soft); color: var(--blue); }
+    .dimension-line { height: 3px; border-radius: 4px; background: var(--line); }
+    .time { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+    .card { border-radius: 30px; overflow: hidden; }
+    .question-wrap { padding: clamp(24px, 5vw, 52px); min-height: 510px; display: flex; flex-direction: column; }
+    .question-kicker { display: flex; align-items: center; gap: 10px; color: var(--blue); font-size: .86rem; font-weight: 800; }
+    .question-kicker::before { content: ""; width: 20px; height: 3px; border-radius: 5px; background: var(--accent); }
+    .question { margin: 30px 0 36px; font-size: clamp(1.55rem, 3.4vw, 2.65rem); line-height: 1.25; letter-spacing: -.035em; max-width: 760px; }
+    .anchors { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 16px; }
+    .anchor { min-height: 58px; color: var(--muted); font-size: .95rem; }
+    .anchor:last-child { text-align: right; }
+    .scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .choice {
+      min-height: 64px; border: 1px solid var(--line); border-radius: 15px; color: var(--ink); background: var(--white);
+      cursor: pointer; font-weight: 800; transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+    .choice:hover { transform: translateY(-2px); border-color: var(--blue); }
+    .choice:focus-visible, .nav-btn:focus-visible, .primary:focus-visible { outline: 3px solid rgba(47,105,217,.35); outline-offset: 3px; }
+    .choice.selected { border-color: var(--ink); background: var(--ink); color: white; }
+    .scale-legend { display: flex; justify-content: space-between; gap: 16px; margin-top: 10px; color: var(--muted); font-size: .78rem; }
+    .question-footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: auto; padding-top: 36px; }
+    .nav-btn, .primary {
+      border: 0; border-radius: 14px; cursor: pointer; font-weight: 800; min-height: 48px; padding: 0 20px;
+    }
+    .nav-btn { background: #eef2f7; color: var(--ink); }
+    .nav-btn:disabled { opacity: .42; cursor: not-allowed; }
+    .answer-hint { color: var(--muted); font-size: .84rem; text-align: right; }
+    .primary { background: var(--accent); color: var(--accent-ink); box-shadow: 0 10px 24px rgba(255, 213, 74, .32); }
+    .result { display: none; }
+    .result.active { display: block; }
+    .result-hero { padding: clamp(28px, 6vw, 60px); background: var(--ink); color: white; }
+    .result-overline { color: #b8caed; font-weight: 750; }
+    .result-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px; margin: 12px 0 16px; }
+    .type-code { font-size: clamp(3rem, 9vw, 6.5rem); line-height: .9; letter-spacing: -.07em; color: var(--accent); font-weight: 900; }
+    .type-name { font-size: clamp(1.4rem, 3vw, 2.1rem); font-weight: 800; }
+    .result-summary { max-width: 760px; margin: 0; color: #e1e8f4; font-size: 1.08rem; }
+    .result-range { max-width: 760px; margin: 13px 0 0; padding-top: 13px; border-top: 1px solid rgba(255,255,255,.16); color: #b8caed; font-size: .92rem; }
+    .result-body { padding: clamp(24px, 5vw, 50px); }
+    .bars { display: grid; gap: 22px; margin-bottom: 34px; }
+    .bar-row { display: grid; grid-template-columns: 44px 1fr 44px; gap: 12px; align-items: center; font-weight: 850; }
+    .bar-row > span:last-child { text-align: right; }
+    .bar-track { position: relative; height: 12px; overflow: hidden; border-radius: 99px; background: #e8edf4; }
+    .bar-center { position: absolute; left: 50%; top: 0; width: 2px; height: 100%; background: white; z-index: 2; }
+    .bar-value { position: absolute; top: 0; bottom: 0; background: linear-gradient(90deg, var(--blue), #7fa9f8); border-radius: inherit; }
+    .score-note { margin-top: 5px; color: var(--muted); font-size: .78rem; font-weight: 600; text-align: center; }
+    .quality { margin: 0 0 24px; padding: 19px 21px; border-radius: 16px; border: 1px solid #cbdcfb; background: var(--blue-soft); }
+    .quality strong { display: block; margin-bottom: 3px; }
+    .quality p { margin: 0; color: #47617f; font-size: .9rem; }
+    .quality.caution { border-color: #eed06d; background: #fff8d8; }
+    .quality.caution p { color: #66571f; }
+    .insights { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .insight { padding: 22px; border-radius: 18px; background: var(--paper); border: 1px solid var(--line); }
+    .insight h3 { margin: 0 0 8px; font-size: 1rem; }
+    .insight p { margin: 0; color: var(--muted); }
+    .result-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .method { margin-top: 24px; padding: 18px 20px; border-left: 4px solid var(--accent); background: #fff9dc; color: #5e5220; border-radius: 8px 14px 14px 8px; font-size: .88rem; }
+    .method details { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(94,82,32,.2); }
+    .method summary { cursor: pointer; font-weight: 800; }
+    .method ul { margin: 10px 0 0; padding-left: 20px; }
+    .method a { color: #254f9d; text-underline-offset: 2px; }
+    footer { padding: 28px 0 42px; text-align: center; color: var(--muted); font-size: .82rem; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 800px) {
+      .shell { width: min(100% - 22px, 680px); }
+      header { min-height: 66px; }
+      .mini-note { display: none; }
+      main { padding-top: 4px; }
+      .intro { margin-bottom: 18px; }
+      .layout { grid-template-columns: 1fr; }
+      .side { position: static; padding: 16px 18px; border-radius: 19px; }
+      .dimension-list, .time { display: none; }
+      .track { margin-bottom: 0; }
+      .card { border-radius: 22px; }
+      .question-wrap { min-height: 480px; padding: 25px 20px; }
+      .question { margin: 24px 0 28px; }
+      .anchors { gap: 16px; }
+      .scale { gap: 7px; }
+      .choice { min-height: 58px; border-radius: 13px; }
+      .insights { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><span class="brand-mark" aria-hidden="true">M</span><span>四维人格偏好测验</span></div>
+      <div class="mini-note">48 道双极题 · 约 8–10 分钟 · 无需注册</div>
+    </header>
+    <main>
+      <section class="intro" id="intro">
+        <p class="eyebrow">MBTI 框架 · 心理测量增强版</p>
+        <h1>你的性格偏好，藏在日常选择里。</h1>
+        <p>请按过去 6 个月“大多数时候的自己”作答，而不是理想中的自己。题目没有好坏答案；稳定的参照时间能让结果更有可比性。</p>
+      </section>
+
+      <section class="layout" id="quiz" aria-label="MBTI 测试">
+        <aside class="side">
+          <div class="side-label"><span>测试进度</span><strong id="progressText">1 / 48</strong></div>
+          <div class="track" aria-hidden="true"><div class="fill" id="progressFill"></div></div>
+          <div class="dimension-list" aria-label="四个探索维度">
+            <div class="dimension"><span>E</span><div class="dimension-line"></div><span>I</span></div>
+            <div class="dimension"><span>S</span><div class="dimension-line"></div><span>N</span></div>
+            <div class="dimension"><span>T</span><div class="dimension-line"></div><span>F</span></div>
+            <div class="dimension"><span>J</span><div class="dimension-line"></div><span>P</span></div>
+          </div>
+          <div class="time">选择更接近你的那一侧；中间选项仅表示两种表现同样常见或取决于情境。</div>
+        </aside>
+
+        <div class="card">
+          <div class="question-wrap" id="questionView">
+            <div class="question-kicker" id="dimensionLabel">能量来源</div>
+            <h2 class="question" id="questionText">周末终于空下来时，你更愿意……</h2>
+            <div class="anchors">
+              <div class="anchor" id="leftAnchor">约朋友见面，在互动中恢复状态</div>
+              <div class="anchor" id="rightAnchor">独处一阵，让思绪和精力慢慢归位</div>
+            </div>
+            <div class="scale" id="scale" role="radiogroup" aria-label="选择更接近你的程度"></div>
+            <div class="scale-legend"><span>非常像左侧</span><span>两种表现同样常见</span><span>非常像右侧</span></div>
+            <div class="question-footer">
+              <button class="nav-btn" id="backBtn" type="button">上一题</button>
+              <span class="answer-hint" id="answerHint" aria-live="polite">请选择一个答案</span>
+            </div>
+          </div>
+
+          <section class="result" id="resultView" aria-live="polite">
+            <div class="result-hero">
+              <div class="result-overline">你的偏好类型</div>
+              <div class="result-title"><span class="type-code" id="typeCode">INFP</span><span class="type-name" id="typeName">理想主义者</span></div>
+              <p class="result-summary" id="typeSummary"></p>
+              <p class="result-range" id="resultRange"></p>
+            </div>
+            <div class="result-body">
+              <h2>四个维度</h2>
+              <div class="bars" id="resultBars"></div>
+              <div class="quality" id="quality"></div>
+              <div class="insights" id="insights"></div>
+              <div class="result-actions">
+                <button class="primary" id="restartBtn" type="button">重新测试</button>
+                <button class="nav-btn" id="reviewBtn" type="button">回看答案</button>
+              </div>
+              <div class="method">
+                <strong>如何看待结果：</strong>这里测量的是连续偏好，并在最后才转换成四字母类型；接近中点的维度不应被强行理解为固定类别。结果不代表能力、人格高低或命运，也不能用于招聘筛选、临床诊断或重大人生决定。本测验是非官方自我探索工具，尚未经过代表性样本的常模、重测和外部效标验证。
+                <details>
+                  <summary>测量设计与研究依据</summary>
+                  <p>每个维度由 12 题覆盖多种日常行为，使用 7 点双极量尺，并交替左右计分方向以减少固定位置作答。结果同时报告连续分数、边界维度和作答质量；这些设计能降低部分测量误差，但不能替代正式的心理测量验证。</p>
+                  <ul>
+                    <li><a href="https://www.apa.org/science/programs/testing/standards" target="_blank" rel="noopener">AERA / APA / NCME《教育与心理测验标准》</a></li>
+                    <li><a href="https://doi.org/10.1111/j.1467-6494.1989.tb00759.x" target="_blank" rel="noopener">McCrae &amp; Costa：MBTI 更接近连续人格维度，而非截然类别</a></li>
+                    <li><a href="https://www.nationalacademies.org/read/1580/chapter/8" target="_blank" rel="noopener">美国国家科学院对 MBTI 应用证据的审慎评估</a></li>
+                    <li><a href="https://myersbriggs.org/research-and-library/validity-reliability/" target="_blank" rel="noopener">Myers &amp; Briggs Foundation 的信度与效度资料</a></li>
+                  </ul>
+                </details>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <footer>基于 MBTI 四维偏好框架设计 · 非官方测验 · 本页不上传或保存你的答案</footer>
+  </div>
+
+  <script>
+    // k=1 时左侧对应第一个字母，k=-1 时左右顺序反转；交替方向可降低固定位置作答偏差。
+    const questions = [
+      { d:'EI', k: 1, f:'恢复方式', q:'周末终于空下来时，你更愿意……', l:'约熟人见面，在互动中恢复状态', r:'独处一阵，让精力慢慢归位' },
+      { d:'SN', k: 1, f:'信息焦点', q:'面对一个全新的任务，你通常先……', l:'确认已有信息与现实条件', r:'想象可能性与更大的图景' },
+      { d:'TF', k: 1, f:'决策标准', q:'团队需要做一个艰难决定时，你会优先……', l:'判断方案是否合理、有效', r:'考虑它会怎样影响每个人' },
+      { d:'JP', k: 1, f:'计划方式', q:'计划一次旅行时，你更舒服的方式是……', l:'尽早定下安排，减少不确定', r:'保留弹性，临近时再决定' },
+
+      { d:'EI', k:-1, f:'社交启动', q:'进入一个几乎没有熟人的活动时，你更常……', l:'先观察，等待自然的切入点', r:'主动介绍自己并打开话题' },
+      { d:'SN', k:-1, f:'应用想象', q:'学到一个新概念时，你首先会想……', l:'它还能延伸出哪些新可能', r:'它能怎样落地并解决问题' },
+      { d:'TF', k:-1, f:'人际考量', q:'朋友的方案明显有漏洞时，你更倾向于……', l:'先照顾感受，再选择合适说法', r:'直接指出问题，帮助方案改善' },
+      { d:'JP', k:-1, f:'任务节奏', q:'手上同时有几件事时，你通常会……', l:'跟着状态灵活切换', r:'列出顺序并逐项推进' },
+
+      { d:'EI', k: 1, f:'表达加工', q:'讨论一个复杂问题时，你更常……', l:'边说边整理自己的想法', r:'想清楚后再开口表达' },
+      { d:'SN', k: 1, f:'注意方式', q:'听别人讲述一件事时，你自然会……', l:'留意细节、步骤与实际变化', r:'捕捉主题、趋势与潜在联系' },
+      { d:'TF', k: 1, f:'公平理解', q:'制定大家都要遵守的规则时，你更看重……', l:'标准一致，避免因人而异', r:'考虑处境，为不同的人留余地' },
+      { d:'JP', k: 1, f:'闭合需要', q:'截止日期还有一周时，你更可能……', l:'先完成关键事项，再真正放松', r:'保留时间，临近时集中完成' },
+
+      { d:'EI', k:-1, f:'刺激耐受', q:'经历一整天会议或社交后，你通常更想……', l:'安静下来，不再接收新的互动', r:'继续聊一会儿，让兴奋自然延续' },
+      { d:'SN', k:-1, f:'证据来源', q:'两种意见都说得通时，你更容易依据……', l:'直觉形成的整体判断', r:'可核对的经验与事实' },
+      { d:'TF', k:-1, f:'支持方式', q:'别人向你倾诉挫折时，你的第一反应更接近……', l:'理解并回应对方当下的感受', r:'分析原因并寻找解决办法' },
+      { d:'JP', k:-1, f:'调整弹性', q:'做出一个重要决定之后，你通常……', l:'愿意在新信息出现时重新选择', r:'倾向维持决定，避免反复改变' },
+
+      { d:'EI', k: 1, f:'反馈来源', q:'当你对一件事拿不准时，你更需要……', l:'和别人交流，从反馈中理清方向', r:'独自反思，从内在判断中确认方向' },
+      { d:'SN', k: 1, f:'表达风格', q:'解释自己的想法时，你更喜欢……', l:'清楚、具体、可执行的表达', r:'用比喻、联想和概念表达' },
+      { d:'TF', k: 1, f:'冲突处理', q:'意见分歧变得激烈时，你更关注……', l:'论点是否成立、证据是否充分', r:'语气是否让关系仍可继续' },
+      { d:'JP', k: 1, f:'协作结构', q:'与人合作一个月度项目时，你更希望……', l:'先明确分工、节点和交付标准', r:'先开始合作，再随过程调整' },
+
+      { d:'EI', k:-1, f:'关系广度', q:'在人际关系中，你更自然地倾向于……', l:'与少数人建立更深的连接', r:'认识不同圈子里的许多人' },
+      { d:'SN', k:-1, f:'记忆表征', q:'回想一段很久以前的经历时，你更容易记住……', l:'它带来的印象与深层含义', r:'发生了什么以及具体细节' },
+      { d:'TF', k:-1, f:'价值权衡', q:'评价一件事“做得好不好”时，你最先关注……', l:'过程是否体谅、价值是否契合', r:'结果是否公平、逻辑是否一致' },
+      { d:'JP', k:-1, f:'环境秩序', q:'对你来说，理想的工作状态更接近……', l:'环境可以随意，随时调整也不影响发挥', r:'桌面与日程有秩序，安排清楚' },
+
+      { d:'EI', k: 1, f:'情绪分享', q:'突然收到期待已久的好消息，你会更想……', l:'尽快告诉别人，一起感受喜悦', r:'先自己消化和体会一会儿' },
+      { d:'SN', k: 1, f:'改进取向', q:'接手一个运行尚可的项目时，你更想……', l:'完善已经有效的方法与细节', r:'重新想象它还可以变成什么' },
+      { d:'TF', k: 1, f:'艰难选择', q:'理性与感受无法兼顾时，你更常坚持……', l:'最经得起推敲的选择', r:'最不违背内心价值的选择' },
+      { d:'JP', k: 1, f:'满足来源', q:'回顾一段忙碌经历时，你更享受……', l:'事情按预计完成的踏实感', r:'过程中遇到意外惊喜的兴奋感' },
+
+      { d:'EI', k:-1, f:'表达节奏', q:'面对还不成熟的想法，你通常会……', l:'等想法成形后再分享', r:'先说出来，通过互动继续发展' },
+      { d:'SN', k:-1, f:'抽象偏好', q:'阅读一篇文章时，更吸引你的通常是……', l:'作者提出的新视角与隐含主题', r:'清晰的事实、案例与操作信息' },
+      { d:'TF', k:-1, f:'批评接收', q:'收到负面反馈时，你更想先确认……', l:'对方真正的感受和期待', r:'反馈是否有依据且能否改进结果' },
+      { d:'JP', k:-1, f:'空闲安排', q:'突然多出一个完全空闲的下午，你更可能……', l:'先看看当时想做什么', r:'很快选定一件事并安排时间' },
+
+      { d:'EI', k: 1, f:'行动能量', q:'连续几天独自工作后，你通常会……', l:'想找人交流，让状态重新活跃', r:'仍喜欢安静，不急着增加互动' },
+      { d:'SN', k: 1, f:'问题拆解', q:'设备或流程出了问题时，你更常……', l:'逐步检查具体环节，找到故障点', r:'先推测整体机制，再验证关键假设' },
+      { d:'TF', k: 1, f:'讨论目标', q:'和朋友讨论一项争议议题时，你更在意……', l:'观点能否保持清楚和前后一致', r:'彼此是否感到被理解与尊重' },
+      { d:'JP', k: 1, f:'日程控制', q:'一周开始时，你更偏好……', l:'知道主要安排和完成顺序', r:'只定大方向，为变化留出空间' },
+
+      { d:'EI', k:-1, f:'社交角色', q:'在一群熟人中，你更常是……', l:'专注听少数人深入聊', r:'主动串联话题和不同的人' },
+      { d:'SN', k:-1, f:'未来判断', q:'想象五年后的生活时，你更自然地……', l:'构想不同版本和可能的转折', r:'根据当前条件推演可实现的路径' },
+      { d:'TF', k:-1, f:'管理方式', q:'带领一个小组时，你更容易先做到……', l:'了解每个人的动机并建立共识', r:'设定客观标准并明确责任' },
+      { d:'JP', k:-1, f:'探索方式', q:'开始一项个人兴趣时，你更喜欢……', l:'先自由尝试，再决定是否形成计划', r:'先设定目标和阶段，再逐步练习' },
+
+      { d:'EI', k: 1, f:'外界参与', q:'遇到生活中的重要变化时，你更倾向于……', l:'通过交谈和共同活动适应变化', r:'留出私密空间慢慢整理感受' },
+      { d:'SN', k: 1, f:'学习路径', q:'学习一项新技能时，你更容易从哪里进入？', l:'示范、练习与清楚的步骤', r:'原理、模型与不同方法的联系' },
+      { d:'TF', k: 1, f:'资源分配', q:'资源有限、无法满足所有请求时，你更依赖……', l:'一致的原则和可解释的优先级', r:'个体需要和具体处境的轻重' },
+      { d:'JP', k: 1, f:'完成标准', q:'一个方案已经可用但还能继续优化时，你更可能……', l:'确认达标后收尾，转向下一件事', r:'保持开放，边使用边继续调整' },
+
+      { d:'EI', k:-1, f:'自我澄清', q:'需要做个人决定时，你更信任……', l:'安静思考后形成的确定感', r:'在对话中逐渐浮现的答案' },
+      { d:'SN', k:-1, f:'变化敏感', q:'参观一个陌生空间时，你更先注意……', l:'氛围、概念和空间传达的感觉', r:'布局、材质和具体使用细节' },
+      { d:'TF', k:-1, f:'关系修复', q:'和亲近的人发生矛盾后，你更想先……', l:'确认彼此感受和关系仍然安全', r:'厘清事实、责任与解决方案' },
+      { d:'JP', k:-1, f:'截止压力', q:'面对一个月后的截止日期，你更自然地……', l:'先探索多种做法，稍后收敛', r:'尽早拆分任务，稳定推进' }
+    ];
+
+    const dims = {
+      EI: { label:'能量来源', a:'E', b:'I', aName:'外向', bName:'内向' },
+      SN: { label:'信息方式', a:'S', b:'N', aName:'实感', bName:'直觉' },
+      TF: { label:'决策依据', a:'T', b:'F', aName:'思考', bName:'情感' },
+      JP: { label:'生活节奏', a:'J', b:'P', aName:'判断', bName:'感知' }
+    };
+
+    const types = {
+      INTJ:{n:'战略规划者',s:'你习惯从复杂信息中看见结构，独立思考，并把长期愿景变成清晰路径。',a:'洞察趋势、系统思考、独立推进',b:'可能对低效率缺少耐心，也容易把高标准默认为共同标准',c:'说明结论背后的逻辑，同时给别人消化和提问的空间',g:'练习更早表达认可，并让“足够好”成为部分任务的标准'},
+      INTP:{n:'逻辑探索者',s:'你好奇事物如何运作，喜欢拆解假设、寻找更准确的解释，也珍惜思考的自由。',a:'分析问题、概念创新、发现矛盾',b:'可能持续优化想法，却推迟落地或忽略情绪信号',c:'先给出核心观点，再补充推导过程，能让别人更容易跟上',g:'把想法变成小实验，用现实反馈帮助思考继续前进'},
+      ENTJ:{n:'果断推动者',s:'你善于确立方向、调动资源，并用直接而高效的方式把目标推向结果。',a:'组织资源、快速决策、长期布局',b:'推进过快时，可能低估关系维护和不同节奏的重要性',c:'提出要求时补充背景与成功标准，并主动邀请不同意见',g:'在行动前多问一句“还有谁会受到影响”'},
+      ENTP:{n:'创意辩证者',s:'你从新点子与智力挑战中获得能量，擅长重新定义问题并打开更多选择。',a:'快速联想、挑战惯例、随机应变',b:'容易被新鲜感带走，收尾与重复执行可能消耗耐心',c:'辩论前先确认对方想探索观点，还是需要支持与决定',g:'为最重要的点子设置完成线，把创造力留给真正值得的问题'},
+      INFJ:{n:'洞察倡导者',s:'你敏锐地理解人和意义，常把深层价值与长期愿景结合起来，安静而坚定。',a:'理解他人、整合复杂信息、价值驱动',b:'可能承担过多情绪责任，也容易因理想与现实的落差疲惫',c:'把隐含期待说清楚，不必等对方自行领会',g:'建立边界，把帮助别人和照顾自己放在同一张清单上'},
+      INFP:{n:'理想主义者',s:'你重视真诚、意义与个人价值，能看见人的独特性，并为重要的可能性保留空间。',a:'共情想象、价值判断、深度表达',b:'遇到价值冲突时可能内耗，也可能因追求理想而迟迟不行动',c:'用具体需求替代含蓄暗示，让温柔的立场也保持清晰',g:'把理想拆成今天能完成的一小步，用行动保护热爱'},
+      ENFJ:{n:'温暖引导者',s:'你善于感知群体氛围、连接不同的人，并鼓励大家朝共同的愿景前进。',a:'激励他人、沟通协调、营造信任',b:'可能过度在意认可，或把别人的需要排在自己之前',c:'在提供建议前先确认对方需要倾听、支持还是方案',g:'定期检查自己的真实意愿，允许关系中出现健康分歧'},
+      ENFP:{n:'灵感连接者',s:'你热情、好奇，擅长发现人与想法之间的连接，并让新的可能性变得有感染力。',a:'激发创意、建立连接、适应变化',b:'选择太多时容易分散，承诺过量也会透支精力',c:'分享灵感时同时说明下一步，帮助热情转化为协作',g:'少做一件事、做深一件事，让自由感和完成感共存'},
+      ISTJ:{n:'可靠执行者',s:'你重视事实、责任与秩序，擅长用稳定的方法守住质量，让事情按承诺完成。',a:'严谨负责、风险意识、持续执行',b:'变化来得太快时可能显得谨慎，也容易把责任全部扛在自己身上',c:'除了指出标准，也说明优先级和可以协商的空间',g:'给新方法一个有限试用期，让证据而非习惯决定是否保留'},
+      ISFJ:{n:'细致守护者',s:'你关注具体需要与实际细节，常用可靠、温和的行动让身边的人感到被照顾。',a:'观察细致、踏实支持、维护稳定',b:'可能不愿麻烦别人，直到负担过重才意识到自己的界限',c:'更早说出困难和需求，不必等到完全确定才开口',g:'把自己的时间也视为需要保护的重要资源'},
+      ESTJ:{n:'秩序组织者',s:'你务实、直接，善于建立规则、明确责任，并让团队在清楚的节奏中前进。',a:'执行管理、标准明确、解决现实问题',b:'重视效率时可能忽略探索过程，或让建议听起来像命令',c:'给出结论后询问现场信息，确保规则服务于真实问题',g:'区分“不同”与“错误”，为有效的新做法保留空间'},
+      ESFJ:{n:'热心协作者',s:'你重视连接与责任，擅长留意他人的需要，并让合作氛围变得温暖、可靠。',a:'照顾体验、组织协作、维系关系',b:'可能把冲突理解为关系受损，也容易受外界评价影响',c:'在照顾气氛的同时说出事实和边界，关系反而更稳固',g:'练习认可自己的判断，不把所有人的满意当作责任'},
+      ISTP:{n:'冷静实干者',s:'你擅长在现实中快速看清问题，用简洁的方法试验、修复并恢复运转。',a:'临场判断、动手解决、保持冷静',b:'可能抗拒过早承诺，也容易把重要感受留到很晚才表达',c:'即使答案还没完整，也可以先告知你的思考状态和下一步',g:'为长期目标设置少量固定节点，保留自由同时减少失联'},
+      ISFP:{n:'敏锐体验者',s:'你温和、真实，对审美与当下体验敏感，常用行动而不是宣言表达在乎。',a:'感受细腻、灵活适应、尊重个体',b:'为避免冲突可能压下真实意见，也可能低估自己的贡献',c:'把感受转成可回应的具体表达，别人才能真正理解你',g:'在不舒服还很轻微时就说出来，为自己争取选择空间'},
+      ESTP:{n:'行动挑战者',s:'你敏锐地捕捉现场机会，喜欢直接进入问题，在变化中用行动找到答案。',a:'果断应变、现实判断、带动气氛',b:'追求即时反馈时，可能低估长期代价或他人的准备程度',c:'行动前用一句话确认目标与边界，能减少后续反复',g:'为重要决定增加一个短暂停顿，检查它对未来的影响'},
+      ESFP:{n:'活力体验者',s:'你开放、热情，善于让人感到自在，并在具体体验中发现生活的亮点。',a:'感染力、关注当下、实际关怀',b:'可能回避枯燥规划，也容易为了气氛而推迟困难对话',c:'表达热情的同时明确承诺范围，避免别人误读你的余量',g:'把长期计划做得可见、可体验，让坚持也带来即时回报'}
+    };
+
+    const scaleLabels = ['完全像左侧','很像左侧','稍像左侧','两种表现同样常见','稍像右侧','很像右侧','完全像右侧'];
+    const DIM_KEYS = ['EI','SN','TF','JP'];
+    const MAX_SCORE = 36;
+    const state = { index: 0, answers: Array(questions.length).fill(null), startedAt: Date.now(), completedViaTool: false };
+
+    const $ = (id) => document.getElementById(id);
+    const scale = $('scale');
+
+    function renderQuestion() {
+      const item = questions[state.index];
+      const answered = state.answers.filter(v => v !== null).length;
+      $('dimensionLabel').textContent = dims[item.d].label;
+      $('questionText').textContent = item.q;
+      $('leftAnchor').textContent = item.l;
+      $('rightAnchor').textContent = item.r;
+      $('progressText').textContent = `${state.index + 1} / ${questions.length}`;
+      $('progressFill').style.width = `${Math.max(answered / questions.length * 100, 2)}%`;
+      $('backBtn').disabled = state.index === 0;
+      $('answerHint').textContent = state.answers[state.index] === null ? '请选择一个答案' : '已作答，可重新选择';
+      scale.innerHTML = '';
+      scaleLabels.forEach((label, i) => {
+        const value = i - 3;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'choice' + (state.answers[state.index] === value ? ' selected' : '');
+        btn.setAttribute('role', 'radio');
+        btn.setAttribute('aria-checked', state.answers[state.index] === value ? 'true' : 'false');
+        btn.setAttribute('aria-label', label);
+        btn.textContent = i + 1;
+        btn.addEventListener('click', () => choose(value));
+        scale.appendChild(btn);
+      });
+    }
+
+    function choose(value) {
+      state.answers[state.index] = value;
+      if (state.index < questions.length - 1) {
+        state.index += 1;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function calculate() {
+      const scores = { EI:0, SN:0, TF:0, JP:0 };
+      questions.forEach((q, i) => { scores[q.d] += (state.answers[i] ?? 0) * q.k; });
+      let code = '';
+      DIM_KEYS.forEach(key => { code += scores[key] <= 0 ? dims[key].a : dims[key].b; });
+      return { scores, code };
+    }
+
+    function getAdjacentTypes(code, scores) {
+      return DIM_KEYS
+        .map((key, index) => ({ key, index, score: scores[key] }))
+        .filter(item => Math.abs(item.score) <= 6)
+        .map(item => {
+          const chars = code.split('');
+          chars[item.index] = chars[item.index] === dims[item.key].a ? dims[item.key].b : dims[item.key].a;
+          return chars.join('');
+        });
+    }
+
+    function getResponseQuality() {
+      const elapsed = (Date.now() - state.startedAt) / 1000;
+      const neutralCount = state.answers.filter(v => v === 0).length;
+      let longest = 1;
+      let run = 1;
+      for (let i = 1; i < state.answers.length; i += 1) {
+        run = state.answers[i] === state.answers[i - 1] ? run + 1 : 1;
+        longest = Math.max(longest, run);
+      }
+      const splitConflicts = DIM_KEYS.filter(key => {
+        const keyed = questions
+          .map((q, i) => q.d === key ? state.answers[i] * q.k : null)
+          .filter(v => v !== null);
+        const first = keyed.filter((_, i) => i % 2 === 0).reduce((a,b) => a + b, 0);
+        const second = keyed.filter((_, i) => i % 2 === 1).reduce((a,b) => a + b, 0);
+        return Math.abs(first) >= 3 && Math.abs(second) >= 3 && Math.sign(first) !== Math.sign(second);
+      }).length;
+      const notes = [];
+      if (!state.completedViaTool && elapsed < 120) notes.push('完成速度很快，可能没有充分区分部分情境');
+      if (longest >= 12) notes.push('出现较长的连续同选模式');
+      if (neutralCount >= 20) notes.push('较多题选择了中间项，维度区分度较低');
+      if (splitConflicts >= 2) notes.push('同一维度前后两组题的方向不够一致');
+      return { caution: notes.length > 0, notes };
+    }
+
+    function showResult() {
+      if (state.answers.some(v => v === null)) return;
+      const { scores, code } = calculate();
+      const type = types[code];
+      $('questionView').style.display = 'none';
+      $('resultView').classList.add('active');
+      $('typeCode').textContent = code;
+      $('typeName').textContent = type.n;
+      $('typeSummary').textContent = type.s;
+      const adjacent = getAdjacentTypes(code, scores);
+      $('resultRange').textContent = adjacent.length
+        ? `有 ${adjacent.length} 个维度接近中点；相邻类型 ${adjacent.map(t => `${t}（${types[t].n}）`).join('、')} 也可能描述你。优先阅读连续分数，而不是只看四字母。`
+        : '四个维度均未落在预设边界区间；结果仍代表连续倾向，而不是不可改变的类别。';
+      $('progressText').textContent = '已完成';
+      $('progressFill').style.width = '100%';
+      $('resultBars').innerHTML = '';
+      DIM_KEYS.forEach(key => {
+        const d = dims[key];
+        const score = scores[key];
+        const pct = Math.max(0, Math.min(100, Math.round(50 + score / MAX_SCORE * 50)));
+        const note = Math.abs(score) <= 6
+          ? `接近中点 · ${d.aName} ${100-pct}% / ${d.bName} ${pct}%`
+          : `${d.aName} ${100-pct}% / ${d.bName} ${pct}%`;
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+        row.innerHTML = `<span>${d.a}</span><div><div class="bar-track"><i class="bar-center"></i><i class="bar-value" style="left:${score < 0 ? pct : 50}%;width:${Math.abs(pct-50)}%"></i></div><div class="score-note">${note}</div></div><span>${d.b}</span>`;
+        $('resultBars').appendChild(row);
+      });
+      const quality = getResponseQuality();
+      $('quality').className = 'quality' + (quality.caution ? ' caution' : '');
+      $('quality').innerHTML = quality.caution
+        ? `<strong>作答质量：建议谨慎解释</strong><p>${quality.notes.join('；')}。这不是判定“无效”，但可能降低结果的稳定性。</p>`
+        : '<strong>作答质量：未见明显异常</strong><p>没有发现明显的过快、连续同选或分半方向冲突。它只说明本次作答模式较完整，不等同于测验已经获得统计学信度或效度。</p>';
+      const cards = [
+        ['你通常带来的优势', type.a], ['值得留意的盲点', type.b],
+        ['更顺畅的沟通方式', type.c], ['一个成长练习', type.g]
+      ];
+      $('insights').innerHTML = cards.map(([h,p]) => `<article class="insight"><h3>${h}</h3><p>${p}</p></article>`).join('');
+      window.scrollTo({ top: $('quiz').offsetTop - 12, behavior: 'smooth' });
+    }
+
+    function restart() {
+      state.index = 0;
+      state.answers.fill(null);
+      state.startedAt = Date.now();
+      state.completedViaTool = false;
+      $('resultView').classList.remove('active');
+      $('questionView').style.display = 'flex';
+      renderQuestion();
+      window.scrollTo({ top: $('quiz').offsetTop - 12, behavior: 'smooth' });
+    }
+
+    function review() {
+      state.index = 0;
+      $('resultView').classList.remove('active');
+      $('questionView').style.display = 'flex';
+      renderQuestion();
+      window.scrollTo({ top: $('quiz').offsetTop - 12, behavior: 'smooth' });
+    }
+
+    $('backBtn').addEventListener('click', () => { if (state.index > 0) { state.index -= 1; renderQuestion(); } });
+    $('restartBtn').addEventListener('click', restart);
+    $('reviewBtn').addEventListener('click', review);
+
+    function registerWebMCP() {
+      const context = document.modelContext;
+      if (!context?.registerTool) return;
+      try {
+        context.registerTool({
+          name: 'complete_mbti_test',
+          title: '完成四维人格偏好测验',
+          description: '一次提交 48 个从 -3 到 3 的答案，完成当前页面的四维人格偏好测验并显示结果。',
+          inputSchema: {
+            type: 'object',
+            properties: { answers: { type: 'array', minItems: 48, maxItems: 48, items: { type: 'integer', minimum: -3, maximum: 3 } } },
+            required: ['answers'], additionalProperties: false
+          },
+          annotations: { readOnlyHint: false, untrustedContentHint: false },
+          execute(input) {
+            if (!input || !Array.isArray(input.answers) || input.answers.length !== 48 || input.answers.some(v => !Number.isInteger(v) || v < -3 || v > 3)) {
+              throw new Error('answers 必须包含 48 个 -3 到 3 的整数。');
+            }
+            state.answers = input.answers.slice();
+            state.index = 47;
+            state.completedViaTool = true;
+            showResult();
+            const result = calculate();
+            return { type: result.code, name: types[result.code].n, scores: result.scores };
+          }
+        });
+      } catch (_) { /* 不影响普通浏览器中的测试体验 */ }
+    }
+
+    renderQuestion();
+    registerWebMCP();
+  </script>
+</body>
+</html>
